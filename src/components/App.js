@@ -7,26 +7,45 @@
  */
 
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, View, Text} from 'react-native';
 import ajax from '../components/ajax';
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import DealList from '../components/DealList.js';
+import DealDetail from '../components/DealDetail.js';
 
 class App extends React.Component {
+  state = {
+    deals: [],
+    currentDealId: null,
+  };
+
+  //fetch the api's and update state
   async componentDidMount() {
     const deals = await ajax.fetchInitialDeals();
-    console.log(deals);
+    this.setState({deals});
   }
+
+  setCurrentDeal = dealId => {
+    this.setState({currentDealId: dealId});
+  };
+  currentDeal = () => {
+    return this.state.deals.find(deal => deal.key === this.state.currentDealId);
+  };
+
   render() {
+    if (this.state.currentDealId) {
+      return <DealDetail deal={this.currentDeal()} />;
+    }
+    if (this.state.deals.length > 0) {
+      return (
+        <DealList
+          deals={this.state.deals}
+          onItemPress={this.setCurrentDeal}></DealList>
+      );
+    }
+
     return (
       <View style={styles.sectionTitle}>
-        <Text style={styles.Header}>BakeSale App </Text>
+        <Text style={styles.Header}>Bakesale</Text>
       </View>
     );
   }
